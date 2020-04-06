@@ -1,5 +1,5 @@
 # Lowest CMake version tried. Lower versions might work.
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.8)
 
 include(GNUInstallDirs)
 
@@ -31,6 +31,7 @@ set(libs tinyjs_static tinyjs_shared)
 
 foreach (lib IN LISTS libs)
   set_target_properties(${lib} PROPERTIES OUTPUT_NAME tinyjs)
+  target_compile_features(${lib} PUBLIC cxx_std_14)
   target_compile_options(${lib} PRIVATE -Wall)
 endforeach ()
 
@@ -42,11 +43,21 @@ install(
 
 install(
   FILES ${headers}
-  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/TinyJS")
+  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
 
 # Add tests and examples
-foreach (exe run_tests Script)
-  add_executable(${exe} ${exe}.cpp)
-  target_link_libraries(${exe} tinyjs_shared)
-endforeach ()
+add_executable(tinyjs_cli Script.cpp)
+target_link_libraries(tinyjs_cli tinyjs_static)
+set_target_properties(tinyjs_cli PROPERTIES OUTPUT_NAME tinyjs)
+target_compile_features(tinyjs_cli PRIVATE cxx_std_14)
+target_compile_options(tinyjs_cli PRIVATE -Wall)
 
+add_executable(tinyjs_tests run_tests.cpp)
+target_link_libraries(tinyjs_tests tinyjs_static)
+set_target_properties(tinyjs_tests PROPERTIES OUTPUT_NAME tinyjs-tests)
+target_compile_features(tinyjs_tests PRIVATE cxx_std_14)
+target_compile_options(tinyjs_tests PRIVATE -Wall)
+
+add_custom_command(
+  TARGET tinyjs_tests POST_BUILD
+  COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_SOURCE_DIR}/tests" "${CMAKE_CURRENT_BINARY_DIR}/tests")
