@@ -1,6 +1,8 @@
 # Lowest CMake version tried. Lower versions might work.
 cmake_minimum_required(VERSION 3.8)
 
+project(tinyjs)
+
 include(GNUInstallDirs)
 
 # Create release build, if not specified.
