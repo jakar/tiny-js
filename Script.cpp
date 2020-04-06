@@ -70,7 +70,10 @@ int main(int argc, char **argv)
 
   while (js->evaluate("lets_quit") == "0") {
     char buffer[2048];
-    fgets ( buffer, sizeof(buffer), stdin );
+    auto result = fgets(buffer, sizeof(buffer), stdin);
+    if (!result) {
+      break;
+    }
     try {
       js->execute(buffer);
     } catch (CScriptException *e) {
